@@ -1,7 +1,6 @@
 # Weather-app
 a python application for getting the current weather
 
-
 ## Requirements
 
 So far the requirements for running this application are:
@@ -48,6 +47,10 @@ Example:
     city="Miami", description="broken clouds", temp="32.48", humidity="69"
 
 It sure is hot! Now we know what to wear today.
+
+Continuing on our example, you can also check if your log driver is working by running the following command:
+
+    grep "Miami" /var/log/messages
 
 ## Conclusion
 
