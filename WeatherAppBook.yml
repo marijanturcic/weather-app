@@ -1,5 +1,5 @@
 ---
-- name: configure minikube server
+- name: configure weather-app VM
   hosts: default
   become: yes
   remote_user: yes
@@ -10,14 +10,14 @@
       state: disabled
   - name: add source files
     copy:
-      src: '{{ playbook_dir }}/weather-app/'
-      dest: /home/vagrant/
+      src: '{{ playbook_dir }}/src/'
+      dest: /home/vagrant/weather-app/
   - name: add docker-ce repo
     copy:
       src: '{{ playbook_dir }}/docker-ce.repo'
       dest: /etc/yum.repos.d/
     loop:
-  - name: install dependencies and kubectl
+  - name: install dependencies
     yum:
       name: '{{ item }}'
       state: latest
@@ -38,7 +38,7 @@
         {
           "log-driver": "syslog"
         }
-  - name: start and enable docker
+  - name: restart docker
     systemd:
       name: docker
       state: restarted
