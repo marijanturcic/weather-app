@@ -1,0 +1,56 @@
+---
+- name: configure minikube server
+  hosts: default
+  become: yes
+  remote_user: yes
+
+  tasks:
+  - name: disable selinux
+    ansible.posix.selinux:
+      state: disabled
+  - name: add source files
+    copy:
+      src: '{{ playbook_dir }}/weather-app/'
+      dest: /home/vagrant/
+  - name: add docker-ce repo
+    copy:
+      src: '{{ playbook_dir }}/docker-ce.repo'
+      dest: /etc/yum.repos.d/
+    loop:
+  - name: install dependencies and kubectl
+    yum:
+      name: '{{ item }}'
+      state: latest
+    loop:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - conntrack-tools
+  - name: start and enable docker
+    systemd:
+      name: docker
+      state: restarted
+      enabled: yes
+  - name: add daemon.json with syslog driver
+    copy:
+      dest: /etc/docker/daemon.json
+      content: |
+        {
+          "log-driver": "syslog"
+        }
+  - name: start and enable docker
+    systemd:
+      name: docker
+      state: restarted
+      enabled: yes
+  - name: enable masquerade
+    ansible.posix.firewalld:
+      zone: public
+      masquerade: yes
+      permanent: yes
+      state: enabled
+  - name: reload firewalld
+    systemd:
+      name: firewalld
+      state: restarted
+...
